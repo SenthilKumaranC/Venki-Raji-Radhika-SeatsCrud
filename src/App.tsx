@@ -1,69 +1,60 @@
-import React, { useCallback, useMemo, useState } from "react";
-import logo from "./logo.svg";
+import { useCallback, useReducer, useRef } from "react";
 import "./App.css";
-import Seat from "./components/Seat/Seat";
 
-export enum SeatStatus{
-  OCCUPIED="occupied",
-  SELECTED="selected",
-  VACANT="vacant"
+export enum SeatStatus {
+  OCCUPIED = "occupied",
+  SELECTED = "selected",
+  VACANT = "vacant",
 }
-export interface IPosition{
-  x:number;
-  y:number;
+
+export interface ICounter {
+  value: number;
+  clicks: number;
 }
-export interface ISeat{
-  id:string;
-  name:string;
-  position:IPosition;
-  rate:number;
-  status:SeatStatus
-}
+
+const initialState: ICounter = {
+  value: 0,
+  clicks: 0,
+};
+
+const reducer = (state: ICounter, action: any) => {
+  switch (action.type) {
+    case "incrementBy":
+      return { ...state, value: state.value + action.payload };
+    case "increment":
+      return { ...state, value: state.value + 1 };
+    case "decrement":
+      return { ...state, value: state.value - 1 };
+    default:
+      return state;
+  }
+};
 
 function App() {
-  const [seats, setSeats] = useState<ISeat[]>([ 
-    {
-      id: "#123",
-      name: "A1",
-      position: { x: 0, y: 0 },
-      rate: 100,
-      status: SeatStatus.VACANT,
-    },
-    {
-      id: "#124",
-      name: "A2",
-      position: { x: 0, y: 0 },
-      rate: 100,
-      status: SeatStatus.OCCUPIED,
-    },
-    {
-      id: "#125",
-      name: "A3",
-      position: { x: 0, y: 0 },
-      rate: 100,
-      status: SeatStatus.VACANT,
-    },
-  ]);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const updateSeatStatus = useCallback((id:string,changes:Partial<ISeat>)=>{
-    const index = seats.findIndex((seat)=>seat.id===id);
-    const selectedSeat = {...seats[index],...changes};
-    const clonedSeats = [...seats];
-    clonedSeats[index] = selectedSeat;
+  const increment = useCallback(() => {
+    dispatch({ type: "increment" });
+  }, []);
 
-    setSeats(clonedSeats);
+  const incrementBy = useCallback(() => {
+    console.log(inputRef.current.value)
+    dispatch({ type: "incrementBy" , payload: Number(inputRef.current.value)});
+  }, []);
 
-  },[seats])
+  const decrement = useCallback(() => {
+    dispatch({ type: "decrement" });
+  }, []);
 
-  const seatsUI = useMemo(() => {
-    return seats.map((seat) => {
-      return <Seat key={seat.id} {...seat} updateOne={updateSeatStatus}></Seat>;
-    });
-  }, [seats,updateSeatStatus]);
+  const inputRef = useRef<any>();
 
   return (
-    <div className="App">
-      <div className="seats">{seatsUI}</div>
+    <div style={{padding:"30px"}}>
+      {state.value}
+      <input ref={inputRef}></input>
+      <button onClick={incrementBy}>Increment By</button>
+      <button onClick={increment}>Increment</button>
+      <button onClick={decrement}>Decrement</button>
     </div>
   );
 }
