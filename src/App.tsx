@@ -1,6 +1,7 @@
 import { useCallback, useReducer, useRef } from "react";
 import "./App.css";
 import Timer from "./components/Timer/Timer";
+import Root from "./components/Root/Root";
 
 export enum SeatStatus {
   OCCUPIED = "occupied",
@@ -57,6 +58,7 @@ function App() {
       <button onClick={increment}>Increment</button>
       <button onClick={decrement}>Decrement</button>
       <Timer></Timer>
+      <Root></Root>
     </div>
   );
 }
